@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html>
+  <head> <px>JWEBGO<px>
+    <base target="_top">
+  </head>
+  <body>
+  <script>
+  (function() {
+    var cx = '008855640707425287024:vypkq6djhom';
+    var gcse = document.createElement('script');
+    gcse.type = 'text/javascript';
+    gcse.async = true;
+    gcse.src = 'https://cse.google.com/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+<gcse:search></gcse:search>
+<gcse:search></gcse:search>
+  </body>
+</html>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Javascript Tetris</title>
+  <style>
+    body      { font-family: Helvetica, sans-serif; }
+    #tetris   { margin: 1em auto; padding: 1em; border: 4px solid black; border-radius: 10px; background-color: #F8F8F8; }
+    #stats    { display: inline-block; vertical-align: top; }
+    #canvas   { display: inline-block; vertical-align: top; background: url(texture.jpg); box-shadow: 10px 10px 10px #999; border: 2px solid #333; }
+    #menu     { display: inline-block; vertical-align: top; position: relative; }
+    #menu p   { margin: 0.5em 0; text-align: center; }
+    #menu p a { text-decoration: none; color: black; }
+    #upcoming { display: block; margin: 0 auto; background-color: #E0E0E0; }
+    #score    { color: red; font-weight: bold; vertical-align: middle; }
+    #rows     { color: blue; font-weight: bold; vertical-align: middle; }
+    #stats    { position: absolute; bottom: 0em; right: 1em; }
+    @media screen and (min-width:   0px) and (min-height:   0px)  { #tetris { font-size: 0.75em; width: 250px; } #menu { width: 100px; height: 200px; } #upcoming { width:  50px; height:  50px; } #canvas { width: 100px; height: 200px; } tr{height: 100px;} } /* 10px chunks */
+    @media screen and (min-width: 400px) and (min-height: 400px)  { #tetris { font-size: 1.00em; width: 350px; } #menu { width: 150px; height: 300px; } #upcoming { width:  75px; height:  75px; } #canvas { width: 150px; height: 300px; } tr{height: 100px;} } /* 15px chunks */
+    @media screen and (min-width: 500px) and (min-height: 500px)  { #tetris { font-size: 1.25em; width: 450px; } #menu { width: 200px; height: 400px; } #upcoming { width: 100px; height: 100px; } #canvas { width: 200px; height: 400px; } tr{height: 100px;} } /* 20px chunks */
+    @media screen and (min-width: 600px) and (min-height: 600px)  { #tetris { font-size: 1.50em; width: 550px; } #menu { width: 250px; height: 500px; } #upcoming { width: 125px; height: 125px; } #canvas { width: 250px; height: 500px; } tr{height: 75px;} } /* 25px chunks */
+    @media screen and (min-width: 700px) and (min-height: 700px)  { #tetris { font-size: 1.75em; width: 650px; } #menu { width: 300px; height: 600px; } #upcoming { width: 150px; height: 150px; } #canvas { width: 300px; height: 600px; } tr{height: 100px;} } /* 30px chunks */
+    @media screen and (min-width: 800px) and (min-height: 800px)  { #tetris { font-size: 2.00em; width: 750px; } #menu { width: 350px; height: 700px; } #upcoming { width: 175px; height: 175px; } #canvas { width: 350px; height: 700px; } tr{height: 150px;} } /* 35px chunks */
+    @media screen and (min-width: 900px) and (min-height: 900px)  { #tetris { font-size: 2.25em; width: 850px; } #menu { width: 400px; height: 800px; } #upcoming { width: 200px; height: 200px; } #canvas { width: 400px; height: 800px; } tr{height: 200px;} } /* 40px chunks */
+    tr        { text-align: center;}
+  </style>
+</head>
+
+<body>
+<script>
+var Stats=function(){
+  function s(a,g,d){
+    var f,c,e;
+    for(c=0;c<30;c++)
+      for(f=0;f<73;f++)
+        e=(f+c*74)*4,a[e]=a[e+4],a[e+1]=a[e+5],a[e+2]=a[e+6];
+        for(c=0;c<30;c++)
+          e=(73+c*74)*4,c<g?(a[e]=b[d].bg.r,a[e+1]=b[d].bg.g,a[e+2]=b[d].bg.b):(a[e]=b[d].fg.r,a[e+1]=b[d].fg.g,a[e+2]=b[d].fg.b)}
+          var r=0,t=2,g,u=0,j=(new Date).getTime(),F=j,v=j,l=0,w=1E3,x=0,k,d,a,m,y,n=0,z=1E3,A=0,f,c,o,B,p=0,C=1E3,D=0,h,i,q,E,b={fps:{bg:{r:16,g:16,b:48},fg:{r:0,g:255,b:255}},ms:{bg:{r:16,g:48,b:16},fg:{r:0,g:255,b:0}},mb:{bg:{r:48,g:16,b:26},fg:{r:255,g:0,b:128}}};
+          g=document.createElement("div");
+          g.style.cursor="pointer";
+          g.style.width="80px";
+          g.style.opacity="0.9";
+          g.style.zIndex="10001";
+          g.addEventListener("click",function(){
+            r++;r==t&&(r=0);
+            k.style.display="none";
+            f.style.display="none";
+            h.style.display="none";
+            switch(r){case 0:k.style.display="block";break;case 1:f.style.display="block";break;case 2:h.style.display="block"}
+          },!1);
+          k=document.createElement("div");
+          k.style.backgroundColor="rgb("+Math.floor(b.fps.bg.r/2)+","+Math.floor(b.fps.bg.g/2)+","+Math.floor(b.fps.bg.b/2)+")";
+          k.style.padding="2px 0px 3px 0px";
+          g.appendChild(k);
+          d=document.createElement("div");
+          d.style.fontFamily="Helvetica, Arial, sans-serif";
+          d.style.textAlign="left";
+          d.style.fontSize="9px";
+          d.style.color="rgb("+b.fps.fg.r+","+b.fps.fg.g+","+b.fps.fg.b+")";
+            d.style.margin="0px 0px 1px 3px";
+            d.innerHTML='<span style="font-weight:bold">FPS</span>';
+            k.appendChild(d);a=document.createElement("canvas");
+            a.width=74;
+            a.height=30;
+            a.style.display="block";
+            a.style.marginLeft="3px";
+            k.appendChild(a);
+            m=a.getContext("2d");
+            m.fillStyle="rgb("+b.fps.bg.r+","+b.fps.bg.g+","+b.fps.bg.b+")";
+            m.fillRect(0,0,a.width,a.height);
+            y=m.getImageData(0,0,a.width,a.height);
+            f=document.createElement("div");
+            f.style.backgroundColor="rgb("+Math.floor(b.ms.bg.r/2)+","+Math.floor(b.ms.bg.g/2)+","+Math.floor(b.ms.bg.b/2)+")";
+            f.style.padding="2px 0px 3px 0px";
+            f.style.display="none";
+            g.appendChild(f);
+            c=document.createElement("div");
+            c.style.fontFamily="Helvetica, Arial, sans-serif";
+            c.style.textAlign="left";c.style.fontSize="9px";
+            c.style.color="rgb("+b.ms.fg.r+","+b.ms.fg.g+","+b.ms.fg.b+")";
+            c.style.margin="0px 0px 1px 3px";
+            c.innerHTML='<span style="font-weight:bold">MS</span>';
+            f.appendChild(c);
+            a=document.createElement("canvas");
+            a.width=74;
+            a.height=30;
+            a.style.display="block";
+            a.style.marginLeft="3px";
+            f.appendChild(a);
+            o=a.getContext("2d");
+            o.fillStyle="rgb("+b.ms.bg.r+","+b.ms.bg.g+","+b.ms.bg.b+")";
+            o.fillRect(0,0,a.width,a.height);
+            B=o.getImageData(0,0,a.width,a.height);
+            try{performance&&performance.memory&&performance.memory.totalJSHeapSize&&(t=3)}
+            catch(G){}h=document.createElement("div");
+            h.style.backgroundColor="rgb("+Math.floor(b.mb.bg.r/2)+","+Math.floor(b.mb.bg.g/2)+","+Math.floor(b.mb.bg.b/2)+")";
+            h.style.padding="2px 0px 3px 0px";
+            h.style.display="none";
+            g.appendChild(h);
+            i=document.createElement("div");
+            i.style.fontFamily="Helvetica, Arial, sans-serif";
+            i.style.textAlign="left";
+            i.style.fontSize="9px";
+            i.style.color="rgb("+b.mb.fg.r+","+b.mb.fg.g+","+b.mb.fg.b+")";
+            i.style.margin="0px 0px 1px 3px";
+            i.innerHTML='<span style="font-weight:bold">MB</span>';
+            h.appendChild(i);
+            a=document.createElement("canvas");
+            a.width=74;
+            a.height=30;
+            a.style.display="block";
+            a.style.marginLeft="3px";
+            h.appendChild(a);
+            q=a.getContext("2d");
+            q.fillStyle="#301010";
+            q.fillRect(0,0,a.width,a.height);
+            E=q.getImageData(0,0,a.width,a.height);
+            return{domElement:g,update:function(){u++;j=(new Date).getTime();
+            n=j-F;z=Math.min(z,n);A=Math.max(A,n);s(B.data,Math.min(30,30-n/200*30),"ms");
+            c.innerHTML='<span style="font-weight:bold">'+n+" MS</span> ("+z+"-"+A+")";
+            o.putImageData(B,0,0);
+            F=j;
+            if(j>v+1E3){l=Math.round(u*1E3/(j-v));
+            w=Math.min(w,l);
+            x=Math.max(x,l);
+            s(y.data,Math.min(30,30-l/100*30),"fps");
+            d.innerHTML='<span style="font-weight:bold">'+l+" FPS</span> ("+w+"-"+x+")";
+            m.putImageData(y,0,0);
+            if(t==3)p=performance.memory.usedJSHeapSize*9.54E-7,C=Math.min(C,p),D=Math.max(D,p),s(E.data,Math.min(30,30-p/2),"mb"),i.innerHTML='<span style="font-weight:bold">'+Math.round(p)+" MB</span> ("+Math.round(C)+"-"+Math.round(D)+")",q.putImageData(E,0,0);
+            v=j;u=0}}}};
+</script>
+
+
+
+  <div id="tetris">
+    <div id="menu">
+      <p id="start"><a href="javascript:play();">Click Here to Play.</a></p>
+      <p><canvas id="upcoming"></canvas></p>
+      <p>score <span id="score">00000</span></p>
+      <p>rows <span id="rows">0</span></p>
+    </div>
+    <canvas id="canvas">
+      Sorry, this example cannot be run because your browser does not support the &lt;canvas&gt; element
+    </canvas>
+    <table width="100%" border="4px" border-radius="5px"><tr><td onclick=clickdown(37)>LEFT</td><td onclick=clickdown(39)>RIGHT</td>
+    <td onclick=clickdown(38)>ROTATE</td><td onclick=clickdown(40)>DROP</td></tr></table>
+  </div>
+  
+  <script src="stats.js"></script>
+
+<script>
+    function get(id)        { return document.getElementById(id);  }
+    function hide(id)       { get(id).style.visibility = 'hidden'; }
+    function show(id)       { get(id).style.visibility = null;     }
+    function html(id, html) { get(id).innerHTML = html;            }
+
+    function timestamp()           { return new Date().getTime();                             }
+    function random(min, max)      { return (min + (Math.random() * (max - min)));            }
+    function randomChoice(choices) { return choices[Math.round(random(0, choices.length-1))]; }
+
+    if (!window.requestAnimationFrame) { // http://paulirish.com/2011/requestanimationframe-for-smart-animating/
+      window.requestAnimationFrame = window.webkitRequestAnimationFrame ||
+                                     window.mozRequestAnimationFrame    ||
+                                     window.oRequestAnimationFrame      ||
+                                     window.msRequestAnimationFrame     ||
+                                     function(callback, element) {
+                                       window.setTimeout(callback, 1000 / 60);
+                                     }
+    }
+
+   
+
+    var KEY     = { ESC: 27, SPACE: 32, LEFT: 37, UP: 38, RIGHT: 39, DOWN: 40 },
+        DIR     = { UP: 0, RIGHT: 1, DOWN: 2, LEFT: 3, MIN: 0, MAX: 3 },
+        stats   = new Stats(),
+        canvas  = get('canvas'),
+        ctx     = canvas.getContext('2d'),
+        ucanvas = get('upcoming'),
+        uctx    = ucanvas.getContext('2d'),
+        speed   = { start: 0.6, decrement: 0.005, min: 0.1 }, // how long before piece drops by 1 row (seconds)
+        nx      = 10, // width of tetris court (in blocks)
+        ny      = 20, // height of tetris court (in blocks)
+        nu      = 5;  // width/height of upcoming preview (in blocks)
+
+
+    var dx, dy,       
+        blocks,       
+        actions,     
+        playing,       // true|false - game is in progress
+        dt,            // time since starting this game
+        current,       // the current piece
+        next,          // the next piece
+        score,         // the current score
+        vscore,        // the currently displayed score (it catches up to score in small chunks - like a spinning slot machine)
+        rows,          // number of completed rows in the current game
+        step;          // how long before current piece drops by 1 row
+
+
+    playing=false;
+    
+    var i = { size: 4, blocks: [0x0F00, 0x2222, 0x00F0, 0x4444], color: 'cyan'   };
+    var j = { size: 3, blocks: [0x44C0, 0x8E00, 0x6440, 0x0E20], color: 'blue'   };
+    var l = { size: 3, blocks: [0x4460, 0x0E80, 0xC440, 0x2E00], color: 'orange' };
+    var o = { size: 2, blocks: [0xCC00, 0xCC00, 0xCC00, 0xCC00], color: 'yellow' };
+    var s = { size: 3, blocks: [0x06C0, 0x8C40, 0x6C00, 0x4620], color: 'green'  };
+    var t = { size: 3, blocks: [0x0E40, 0x4C40, 0x4E00, 0x4640], color: 'purple' };
+    var z = { size: 3, blocks: [0x0C60, 0x4C80, 0xC600, 0x2640], color: 'red'    };
+
+ 
+    function eachblock(type, x, y, dir, fn) {
+      var bit, result, row = 0, col = 0, blocks = type.blocks[dir];
+      for(bit = 0x8000 ; bit > 0 ; bit = bit >> 1) {
+        if (blocks & bit) {
+          fn(x + col, y + row);
+        }
+        if (++col === 4) {
+          col = 0;
+          ++row;
+        }
+      }
+    }
+
+  
+    function occupied(type, x, y, dir) {
+      var result = false
+      eachblock(type, x, y, dir, function(x, y) {
+        if ((x < 0) || (x >= nx) || (y < 0) || (y >= ny) || getBlock(x,y))
+          result = true;
+      });
+      return result;
+    }
+
+    function unoccupied(type, x, y, dir) {
+      return !occupied(type, x, y, dir);
+    }
+
+    var pieces = [];
+    function randomPiece() {
+      if (pieces.length == 0)
+        pieces = [i,i,i,i,j,j,j,j,l,l,l,l,o,o,o,o,s,s,s,s,t,t,t,t,z,z,z,z];
+      var type = pieces.splice(random(0, pieces.length-1), 1)[0];
+      return { type: type, dir: DIR.UP, x: Math.round(random(0, nx - type.size)), y: 0 };
+    }
+
+
+
+    function run() {
+      showStats(); 
+      addEvents(); 
+
+      var last = now = timestamp();
+      function frame() {
+        now = timestamp();
+        update(Math.min(1, (now - last) / 1000.0));
+        draw();
+        stats.update();
+        last = now;
+        requestAnimationFrame(frame, canvas);
+//        window.alert("stuff");//works here
+      }
+      
+      resize(); 
+      reset();
+      frame(); 
+    }
+
+    function showStats() {
+      stats.domElement.id = 'stats';
+      get('menu').appendChild(stats.domElement);
+    }
+
+    function addEvents() {
+      document.addEventListener('keydown', keydown, false);
+      window.addEventListener('resize', resize, false);
+    }
+
+    function resize(event) {
+      canvas.width   = canvas.clientWidth;  
+      canvas.height  = canvas.clientHeight; 
+      ucanvas.width  = ucanvas.clientWidth;
+      ucanvas.height = ucanvas.clientHeight;
+      dx = canvas.width  / nx; 
+      dy = canvas.height / ny;
+
+      invalidate();
+
+      invalidateNext();
+    }
+     
+     function keydown(ev) {
+      var handled = false;
+      if (playing) {
+        switch(ev.keyCode) {
+          case KEY.LEFT:   actions.push(DIR.LEFT);  handled = true; break;
+          case KEY.RIGHT:  actions.push(DIR.RIGHT); handled = true; break;
+          case KEY.UP:     actions.push(DIR.UP);    handled = true; break;
+          case KEY.DOWN:   actions.push(DIR.DOWN);  handled = true; break;
+          case KEY.ESC:    lose();                  handled = true; break;     
+          //case KEY.SPACE:  actions.push(DIR.DOWN);   handled = true; break;
+        }
+      }
+      else if (ev.keyCode == key.space) {
+        //window.alert("stuff");    // function works
+        play();
+        handled = true;
+      }
+      if (handled)
+        ev.preventDefault();
+    }
+    
+ 
+    function clickdown(ev) {
+      var handled = false;
+      if (playing) {
+        switch(ev) {
+          case KEY.LEFT:   actions.push(DIR.LEFT);  handled = true; break;
+          case KEY.RIGHT:  actions.push(DIR.RIGHT); handled = true; break;
+          case KEY.UP:     actions.push(DIR.UP);    handled = true; break;
+          case KEY.DOWN:   actions.push(DIR.DOWN);  handled = true; break;
+          case KEY.ESC:    lose(hahaha);                  handled = true; break;     
+          
+        }
+      }
+      else if (ev.keyCode == key.space) {
+       
+        handled = true;
+      }
+      if (handled)
+        ev.preventDefault();
+    }
+    
+  
+    function play() { hide('start'); reset();          playing = true;  }
+    function lose() { show('start'); setVisualScore(); playing = false; }
+
+    function setVisualScore(n)      { vscore = n || score; invalidateScore(); }
+    function setScore(n)            { score = n; setVisualScore(n);  }
+    function addScore(n)            { score = score + n;   }
+    function clearScore()           { setScore(0); }
+    function clearRows()            { setRows(0); }
+    function setRows(n)             { rows = n; step = Math.max(speed.min, speed.start - (speed.decrement*rows)); invalidateRows(); }
+    function addRows(n)             { setRows(rows + n); }
+    function getBlock(x,y)          { return (blocks && blocks[x] ? blocks[x][y] : null); }
+    function setBlock(x,y,type)     { blocks[x] = blocks[x] || []; blocks[x][y] = type; invalidate(); }
+    function clearBlocks()          { blocks = []; invalidate(); }
+    function clearActions()         { actions = []; }
+    function setCurrentPiece(piece) { current = piece || randomPiece(); invalidate();     }
+    function setNextPiece(piece)    { next    = piece || randomPiece(); invalidateNext(); }
+
+    function reset() {
+      dt = 0;
+      clearActions();
+      clearBlocks();
+      clearRows();
+      clearScore();
+      setCurrentPiece(next);
+      setNextPiece();
+    }
+
+    function update(idt) {
+      if (playing) {
+        if (vscore < score)
+          setVisualScore(vscore + 1);
+        handle(actions.shift());
+        dt = dt + idt;
+        if (dt > step) {
+          dt = dt - step;
+          drop();
+        }
+      }
+    }
+
+    function handle(action) {
+      switch(action) {
+        case DIR.LEFT:  move(DIR.LEFT);  break;
+        case DIR.RIGHT: move(DIR.RIGHT); break;
+        case DIR.UP:    rotate();        break;
+        case DIR.DOWN:  drop();          break;
+      }
+    }
+
+    function move(dir) {
+      var x = current.x, y = current.y;
+      switch(dir) {
+        case DIR.RIGHT: x = x + 1; break;
+        case DIR.LEFT:  x = x - 1; break;
+        case DIR.DOWN:  y = y + 1; break;
+      }
+      if (unoccupied(current.type, x, y, current.dir)) {
+        current.x = x;
+        current.y = y;
+        invalidate();
+        return true;
+      }
+      else {
+        return false;
+      }
+    }
+
+    function rotate() {
+      var newdir = (current.dir == DIR.MAX ? DIR.MIN : current.dir + 1);
+      if (unoccupied(current.type, current.x, current.y, newdir)) {
+        current.dir = newdir;
+        invalidate();
+      }
+    }
+
+    function drop() {
+      if (!move(DIR.DOWN)) {
+        addScore(10);
+        dropPiece();
+        removeLines();
+        setCurrentPiece(next);
+        setNextPiece(randomPiece());
+        clearActions();
+        if (occupied(current.type, current.x, current.y, current.dir)) {
+          lose();
+        }
+      }
+    }
+
+    function dropPiece() {
+      eachblock(current.type, current.x, current.y, current.dir, function(x, y) {
+        setBlock(x, y, current.type);
+      });
+    }
+
+    function removeLines() {
+      var x, y, complete, n = 0;
+      for(y = ny ; y > 0 ; --y) {
+        complete = true;
+        for(x = 0 ; x < nx ; ++x) {
+          if (!getBlock(x, y))
+            complete = false;
+        }
+        if (complete) {
+          removeLine(y);
+          y = y + 1; // recheck same line
+          n++;
+        }
+      }
+      if (n > 0) {
+        addRows(n);
+        addScore(100*Math.pow(2,n-1)); // 1: 100, 2: 200, 3: 400, 4: 800
+      }
+    }
+
+    function removeLine(n) {
+      var x, y;
+      for(y = n ; y >= 0 ; --y) {
+        for(x = 0 ; x < nx ; ++x)
+          setBlock(x, y, (y == 0) ? null : getBlock(x, y-1));
+      }
+    }
+
+
+    var invalid = {};
+
+    function invalidate()         { invalid.court  = true; }
+    function invalidateNext()     { invalid.next   = true; }
+    function invalidateScore()    { invalid.score  = true; }
+    function invalidateRows()     { invalid.rows   = true; }
+
+    function draw() {
+      ctx.save();
+      ctx.lineWidth = 1;
+      ctx.translate(0.5, 0.5); // for crisp 1px black lines
+      drawCourt();
+      drawNext();
+      drawScore();
+      drawRows();
+      ctx.restore();
+      //window.alert("stuff");
+    }
+
+    function drawCourt() {
+      if (invalid.court) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        if (playing)
+          drawPiece(ctx, current.type, current.x, current.y, current.dir);
+        var x, y, block;
+        for(y = 0 ; y < ny ; y++) {
+          for (x = 0 ; x < nx ; x++) {
+            if (block = getBlock(x,y))
+              drawBlock(ctx, x, y, block.color);
+          }
+        }
+        ctx.strokeRect(0, 0, nx*dx - 1, ny*dy - 1); // court boundary
+        invalid.court = false;
+      }
+    }
+
+    function drawNext() {
+      if (invalid.next) {
+        var padding = (nu - next.type.size) / 2; // half-arsed attempt at centering next piece display
+        uctx.save();
+        uctx.translate(0.5, 0.5);
+        uctx.clearRect(0, 0, nu*dx, nu*dy);
+        drawPiece(uctx, next.type, padding, padding, next.dir);
+        uctx.strokeStyle = 'black';
+        uctx.strokeRect(0, 0, nu*dx - 1, nu*dy - 1);
+        uctx.restore();
+        invalid.next = false;
+      }
+    }
+
+    function drawScore() {
+      if (invalid.score) {
+        html('score', ("00000" + Math.floor(vscore)).slice(-5));
+        invalid.score = false;
+      }
+    }
+
+    function drawRows() {
+      if (invalid.rows) {
+        html('rows', rows);
+        invalid.rows = false;
+      }
+    }
+
+    function drawPiece(ctx, type, x, y, dir) {
+      eachblock(type, x, y, dir, function(x, y) {
+        drawBlock(ctx, x, y, type.color);
+      });
+    }
+
+    function drawBlock(ctx, x, y, color) {
+      ctx.fillStyle = color;
+      ctx.fillRect(x*dx, y*dy, dx, dy);
+      ctx.strokeRect(x*dx, y*dy, dx, dy)
+    }
+
+
+run();
+start();
+  </script>
+</body>
+
+</html>
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+  </head>
+  <body>
+    <!-- TWO STEPS TO INSTALL POKEMON:
+
+  1.  Copy the coding into the HEAD of your HTML document
+  2.  Add the last code into the BODY of your HTML document  -->
+
+<!-- STEP ONE: Paste this code into the HEAD of your HTML document  -->
+
+<HEAD>
+
+<SCRIPT LANGUAGE="JavaScript">
+<!-- Original:  Paul (Poke_Paul@hotmail.com) -->
+<!-- Web Site:  http://www.angelfire.com/ak3/MewHiddenLair -->
+
+<!-- This script and many more are available free online at -->
+<!-- The JavaScript Source!! http://www.javascriptsource.com -->
+
+<!-- Begin
+now=new Date;
+x=now.getTime() %32768;
+function Random(min,max) {
+x=(1103515245*x+12345) % 32768;
+return Math.floor(x*(max-min+1)/32768+min);
+}
+var num = new Array;
+num[0] = -1;
+num[1] = 1;
+var ctrsmit = new Array;
+ctrsmit[0] = '<|x_x|>';
+ctrsmit[1] = '<|!_!|>';
+var i = 0, will2live = 0;
+function livewill(j) {
+i += j;
+if (i == 0) tLiphe();
+if (i < 6) stat(mood[3]);
+if (oldstats == mood[3] && i >= 6) stat(mood[0]);
+if (alive == true) {
+barzies(i);
+   }
+}
+var bars='';
+function barzies(num) {
+bars='';
+for (var i=0;i!=num;i++) bars += '';
+document.ctrform.will.value = bars;
+}
+var mood = new Array;
+mood[0] = 'Happy';
+mood[1] = 'Mad';
+mood[2] = 'Ticked-Off';
+mood[3] = 'Suicidal';
+mood[4] = 'Elated';
+var Stat = new Array;
+Stat[0] = 'Alive';
+Stat[1] = 'Pokeball cleaned';
+Stat[2] = 'Pokeball not messy';
+Stat[3] = 'In pain';
+Stat[4] = 'Dead';
+Stat[5] = 'Infected!';
+Stat[6] = 'Disinfected!';
+Stat[7] = 'Not infected';
+Stat[8] = 'Drooling';
+var alive = false, aniID, statID, moodID, liveID, crapID, sickID, illID, normguy = '<(^_^)>';
+function gLiphe() {
+normguy = '<(^_^)>';
+stat('Catching...');
+livewill(15);
+statID = setTimeout("stat(Stat[0])",3500);
+setTimeout("alive = true",3500);
+Animate(false,'(-o-)');
+aniID = setTimeout("Animate(false,'<(o_o)>')",2500);
+aniID = setTimeout("Animate(false,'(O_o)>')",3500);
+aniID = setTimeout("Animate(false,'<(o_o)>')",4300);
+aniID = setTimeout("Animate(false,'<(o_O)')",4500);
+aniID = setTimeout("Animate(false,'<(o_o)>')",5300);
+aniID = setTimeout("Animate(false,'(O_o)>')",5500);
+aniID = setTimeout("Animate(false,normguy)",6500);livewill(15);
+setTimeout("independence()",6501)
+}
+function ID(dep) {
+clearTimeout(aniID);
+clearTimeout(statID);
+clearTimeout(liveID);
+clearTimeout(crapID);
+if (dep == true) clearTimeout(independ);
+}
+var f, t = '          ';
+function Animate(auto,ctrex) {
+if (auto == false) f = ctrex;
+if (auto == true) t = spacey.substring(0,Pos());
+document.ctrform.ctr.value = t + ctrex + poopie();
+}
+var indID, independ;
+function independence() {
+independ = setTimeout("Animate(true,f)",400);
+independ = setTimeout("Animate(true,f)",1200);
+independ = setTimeout("Animate(true,f)",2000);
+independ = setTimeout("Animate(true,f)",2800);
+independ = setTimeout("Animate(true,f)",3600);
+indID = setTimeout("independence()",4000);
+}
+var spacey = '                            ', k, l = 10;
+function Pos() {
+k = Random(0,1)
+if (k == 0) {
+if (t.length < 22) return l++;
+else if (t.length >= 22) Pos()
+}
+if (k == 1) {
+if (t.length > 0) return l--;
+else if (t.length == 0) return l++;
+   }
+}
+var poop = false;
+function poopie() {
+if (poop == true) return " <<poo>> ";
+else return '';
+}
+function eatpoop() {
+if (poop == false) {
+document.ctrform.phood.selectedIndex = 0;
+stat(Stat[2]);
+} 
+if (poop == true) {
+ID(true);
+eatpoopie();
+   }
+}
+function eatpoopie() {
+poop = false;
+eat(false,'<<poo>>');
+aniID = setTimeout("Animate(false,'<(¯o>)>')",750);
+if (sick == false) setTimeout("befect()",4000);
+}
+var pasto,healthy,eaty='<(¯o¯)>',eati='<(¯-¯)>',eaty2;
+function eat(health,pasti) {
+healthy = health;
+pasto = pasti;
+if (sick == true) {
+eaty = '<(¡o¡)>';
+eaty2 = '<(¡o)>';
+eati = '<(¡-¡)>';
+}
+else {
+eaty = '<(¯o¯)>';
+eaty2 = '<(¯o)>';
+eati = '<(¯-¯)>';
+}
+Animate(false,eati +'  '+ pasto);
+aniID = setTimeout("Animate(false,eaty +'  '+ pasto)",150);
+aniID = setTimeout("Animate(false,eaty +' '+ pasto)",300);
+aniID = setTimeout("Animate(false,eaty + pasto)",450);
+aniID = setTimeout("Animate(false,eaty2+ pasto)",600);
+setTimeout("phood(healthy)",650);
+}
+function pheed(antipasto) {
+if (antipasto == 0) eat(true,'>o<');
+else if (antipasto == 1) eat(true,'ð');
+else if (antipasto == 2) eatpoop();
+}
+function takeone() {
+ID(true);
+Animate(false,'<(¯=¯)>');
+aniID = setTimeout("Animate(false,'<(>_<)>')",500);
+aniID = setTimeout("Animate(false,'<(¯=¯)>')",1300);
+aniID = setTimeout("Animate(false,'<(>_<)>')",2600);
+aniID = setTimeout("Animate(false,normguy)",4800);
+setTimeout("infekt()",4799);
+setTimeout("poop = true",4799);
+full = 0;
+}
+function cleancage() {
+if (poop == false) stat(Stat[2]);
+if (poop == true) {
+poop = false;
+Animate(false,normguy);
+stat(Stat[1]);
+clearTimeout(sickID);
+ickcount = 0;
+   }
+}
+function tLiphe() {
+normguy = '<(×_×)>';
+poop = false;
+clearTimeout(sickID);
+clearTimeout(illID);
+clearTimeout(indID);
+ID(true);
+sick = false;
+full = 0;
+l = 1;
+i = 0;
+aniID = setTimeout("Animate(false,normguy)",1);
+statID = setTimeout("stat(Stat[4])",1);
+barzies(0);
+bruised = 0;
+poked = false;
+alive = false;
+}
+var oldstats, ick = '';
+function stat(stats) {
+ick = '';
+oldstats = stats;
+if (sick == true) ick = '[sick] ';
+document.ctrform.ctrstatus.value = ick + oldstats;
+}
+var j;
+function smite() {
+if (sick == false) normguy = '<(<¬>_<¬>)>';
+ID(true);
+statID = setTimeout("stat(Stat[3])",10);
+aniID = setTimeout("Animate(false,ctrsmit[Random(0,1)])",10);
+liveID = setTimeout("livewill(num[0])",20);
+aniID = setTimeout("Animate(false,normguy)",1300);
+statID = setTimeout("stat(mood[1])",1300);
+}
+var full = 0;
+function phood(salubrious) {
+if (sick == false) normguy = '<(^_^)>';
+ID(true);
+full++;
+if (salubrious == true) livewill(num[1]);
+aniID = setTimeout("Animate(false,eaty)",200);
+aniID = setTimeout("Animate(false,eati)",700);
+aniID = setTimeout("Animate(false,eaty)",1200);
+aniID = setTimeout("Animate(false,eati)",1700);
+aniID = setTimeout("Animate(false,eaty)",2200);
+aniID = setTimeout("Animate(false,eati)",2700);
+aniID = setTimeout("Animate(false,normguy)",3200);
+if (full == 3) setTimeout("takeone()",6000);
+if (full >= 3) full = 0;
+}
+var sick = false, ickcount = 0;
+function infekt() {
+ickcount++;
+if (ickcount != 2) sickID = setTimeout("infekt()",30000);
+if (ickcount == 2) befect();
+}
+function befect() {
+sick = true;
+setTimeout("stat(Stat[5])",500);
+ickcount = 0;
+besick();
+normguy = '<(¡_¡)>';
+}
+function besick() {
+livewill(num[0]);
+Animate(false,normguy);
+if (sick == true) illID = setTimeout("besick()",2000);
+}
+function dnfekt() {
+if (sick == false) stat(Stat[7]);
+if (sick == true) {
+if (poop == false) clearTimeout(sickID);
+normguy = '<(^_^)>';
+eat(false,'¤');
+sick = false;
+setTimeout("stat(Stat[6])",4000);
+ickcount = 0;
+if (poop == true) infekt();
+   }
+}
+function scratchyscratchy() {
+normguy = '<(^_^)>';
+ID(true);
+statID = setTimeout("stat(Stat[8] +'(scratch scratch)')",710);
+aniID = setTimeout("Animate(false,'¦ p')",200);
+aniID = setTimeout("Animate(false,'¦ P¨')",800);
+aniID = setTimeout("Animate(false,'¦ p ¨')",1400);
+aniID = setTimeout("Animate(false,'¦ P¨¨')",2000);
+aniID = setTimeout("Animate(false,'¦ p ¨¨')",2600);
+aniID = setTimeout("Animate(false,'¦ P¨¨¨')",3400);
+aniID = setTimeout("Animate(false,'¦ p ¨¨¨')",4200);
+aniID = setTimeout("Animate(false,'¦ P ¨¨¨¨')",5000);
+aniID = setTimeout("Animate(false,': P¨')",5600);
+aniID = setTimeout("Animate(false,normguy)",6600);
+statID = setTimeout("stat(mood[0])",6600);
+liveID = setTimeout("livewill(num[1])",6600);
+}
+var bruised = 0, poked = false;
+function poke() {
+if (bruised >= 7) {
+normguy='o_-';
+aniID = setTimeout("Animate(false,'(O_-)')",1);
+liveID = setTimeout("livewill(num[0])",1);
+if (poked == false) statID = setTimeout("stat('You poked his eye out!!')",10);
+aniID = setTimeout("Animate(false,normguy)",300);
+poked = true;
+}
+if (bruised < 7) {
+bruised++;
+normguy = '<(^_^)>'
+aniID = setTimeout("Animate(false,' <(^o^)>')",1);
+liveID = setTimeout("livewill(num[1])",1);
+statID = setTimeout("stat('Pika, pi!...')",10);
+aniID = setTimeout("Animate(false,normguy)",300);
+   }
+}
+//  End -->
+</script>
+</HEAD>
+
+<!-- STEP TWO: Copy this code into the BODY of your HTML document  -->
+
+<BODY>
+
+<center>
+<form name="ctrform">
+<table BORDER="4" CELLSPACING="5" CELLPADDING="5" bgcolor="yellow">
+<tr><td><font color="blue"><br>
+<table>
+<tr>
+<th>Name</th>
+<th>Status</th>
+</tr>
+<tr>
+<td><div align="center"><center><p><input type="text" size="20" name="will"></td>
+<td align="center"><input type="text" size="25" name="ctrstatus"></td>
+</tr>
+<tr align="center">
+<th></th>
+<th>Options</th>
+</tr>
+<tr align="center">
+<td><input type="text" name="ctr" size="30" onFocus="if (alive == true) tLiphe()"></td>
+<td><div align="center"><center><p><input type="button" value="Catch a Pikachu"
+onClick="if (alive == false) gLiphe()"></td>
+</tr>
+</table>
+<div align="center"><center>
+<table>
+<tr>
+<td><input type="button" value="Smack" onClick="if (alive == true) smite()"></td></tr><tr>
+<td><input type="button" value="Clean Pokéball" onClick="if (alive == true) cleancage()"></td></tr><tr>
+<td><input type="button" value="Give Medicine" onClick="if (alive == true) dnfekt()"></td>
+</tr>
+<tr>
+<td><input type="button" value="Give Food"
+onClick="if (alive == true) pheed(document.ctrform.phood.selectedIndex)"> 
+<select name="phood" size="1">
+<option>Rare Candy</option>
+<option>Apple</option> 
+</select></td>
+</tr>
+<tr>
+<td><input type="button" value="Scratch" onClick="if (alive == true) scratchyscratchy()"></td>
+</tr>
+<tr>
+<td><input type="button" value="Poke Pika" onClick="if (alive == true) poke()"><br></td>
+</tr>
+</table>
+</center>
+</div>
+</td>
+</tr>
+</table>
+</form>
+</center>
+
+<p><center>
+<font face="comic sans ms" size="20"><br/>
+PikaGatchi</font>
+</center><p>
+  </body>
+</html>
+<html>
